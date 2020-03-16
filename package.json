@@ -1,0 +1,48 @@
+{
+  "name": "mutual-aid-network-server",
+  "version": "1.0.0",
+  "description": "server mutual aid hub",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "read": "node bin/read-google-sheets",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/townhallproject/mutual-aid-networks-server.git"
+  },
+  "author": "Megan Riel-Mehan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/townhallproject/mutual-aid-networks-server/issues"
+  },
+  "homepage": "https://github.com/townhallproject/mutual-aid-networks-server#readme",
+  "dependencies": {
+    "@google-cloud/firestore": "^3.7.0",
+    "@google/maps": "^0.3.1",
+    "cors": "^2.8.5",
+    "dotenv": "^4.0.0",
+    "express": "^4.14.0",
+    "express-request-proxy": "^2.2.2",
+    "express-session": "^1.15.0",
+    "firebase-admin": "^8.7.0",
+    "firebaseui": "^1.0.0",
+    "geo-distance": "^0.1.2",
+    "geolib": "^2.0.24",
+    "google-auth-library": "^0.12.0",
+    "google-maps": "^3.2.1",
+    "googleapis": "^24.0.0",
+    "moment": "^2.21.0",
+    "moment-timezone": "^0.5.26",
+    "morgan": "^1.9.1",
+    "superagent": "^3.8.2"
+  },
+  "devDependencies": {
+    "eslint": "^3.16.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.10.0"
+  }
+}
