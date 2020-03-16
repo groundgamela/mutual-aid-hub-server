@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "server mutual aid hub",
   "main": "index.js",
+  "engines": {
+    "node": ">= 10.0",
+    "npm": ">= 6.4.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "read": "node bin/read-google-sheets",
