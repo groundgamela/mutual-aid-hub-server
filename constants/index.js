@@ -8,7 +8,6 @@ const HEADERS = [
     "supportRequestForm",
     "supportOfferForm",
     "facebookPage",
-    "category",
     "language",
     "community",
     "contact",
