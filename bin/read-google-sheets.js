@@ -75,7 +75,6 @@ function checkIfExists(title) {
       if (!querySnapshot.empty) {
         return true;
       } else {
-        console.log('didnt find it', title)
         return false;
       }
     })
@@ -86,7 +85,7 @@ function checkIfExists(title) {
 }
 
 function convertOneObject(object, rowNumber) {
-  const googleSheetsRange = `List of Mutual Aid Networks!N${rowNumber}:Q${rowNumber}`
+  const googleSheetsRange = `North American Mutual Aid Networks!N${rowNumber}:Q${rowNumber}`
   let googleSheetData;
   let mutualAid = new MutualAidNetwork(object);
   if (mutualAid.country !== 'USA') {
@@ -113,7 +112,6 @@ function convertOneObject(object, rowNumber) {
                 firestore.collection("mutual_aid_networks").add(databaseEvent)
                   .then(function (docRef) {
                     googleSheetData = [docRef.id, true, databaseEvent.address, ''];
-                    console.log("Document written with ID: ", docRef.id);
                   })
                   .catch(function (error) {
                     console.error("Error adding document: ", error);
@@ -157,7 +155,7 @@ function processOneRow(rowNumber, rowData) {
   }
 }
 
-googleMethods.read(oauth2Client, SHEET_ID, 'List of Mutual Aid Networks!A3:M')
+googleMethods.read(oauth2Client, SHEET_ID, 'North American Mutual Aid Networks!A3:M')
   .then((googleRows) => {
     googleRows.forEach((row, i) => {
       const thisRowIndex = i + 2;
