@@ -54,6 +54,7 @@ function getNewToken(oauth2Client, callback) {
   });
 }
 
+
 function writeToGoogle(googleSheetsRange, data) {
   const toWrite = {
     'range': googleSheetsRange,
@@ -65,7 +66,7 @@ function writeToGoogle(googleSheetsRange, data) {
   if (testing) {
     return Promise.resolve();
   }
-  return googleMethods.write(oauth2Client, SHEET_ID, [toWrite]);
+  return googleMethods.write(oauth2Client, SHEET_ID, toWrite);
 }
 
 function checkIfExists(title) {
@@ -85,7 +86,7 @@ function checkIfExists(title) {
 }
 
 function convertOneObject(object, rowNumber) {
-  const googleSheetsRange = `North American Mutual Aid Networks!N${rowNumber}:Q${rowNumber}`
+  const googleSheetsRange = `North American Mutual Aid Networks!R${rowNumber}:U${rowNumber}`
   let googleSheetData;
   let mutualAid = new MutualAidNetwork(object);
   if (mutualAid.country !== 'USA') {
@@ -97,21 +98,20 @@ function convertOneObject(object, rowNumber) {
     if (exists) {
       return;
     }
-
     // geocode street address
     if (mutualAid.state) {
       mutualAid.getLatandLog()
         .then(() => {
           if (mutualAid.lat) {
-            const databaseEvent = mutualAid.createDatabaseObject();
-            const valid = validate.mutualAidNetwork(databaseEvent);
+            const databaseNetwork = mutualAid.createDatabaseObject();
+            const valid = validate.mutualAidNetwork(databaseNetwork);
             if (valid) {
               // R, S, T, U
               // id,	validated, 	formatted_address, 	last_updated
               if (true) {
-                firestore.collection("mutual_aid_networks").add(databaseEvent)
+                firestore.collection("mutual_aid_networks").add(databaseNetwork)
                   .then(function (docRef) {
-                    googleSheetData = [docRef.id, true, databaseEvent.address, ''];
+                    googleSheetData = [docRef.id, true, databaseNetwork.address, ''];
                   })
                   .catch(function (error) {
                     console.error("Error adding document: ", error);
@@ -119,11 +119,11 @@ function convertOneObject(object, rowNumber) {
               }
             } else {
               console.log('failed');
-              googleSheetData = ['', validate.mutualAidNetwork.errors[0].dataPath, databaseEvent.address, ''];
+              googleSheetData = ['', validate.mutualAidNetwork.errors[0].dataPath, databaseNetwork.address, ''];
             }
             return writeToGoogle(googleSheetsRange, googleSheetData)
           } else {
-            console.log('no lat', databaseEvent.title)
+            console.log('no lat', mutualAid.title)
           }
         }).catch((e) => console.log(e.message, mutualAid.neighborhood, mutualAid.city, mutualAid.state))
 
