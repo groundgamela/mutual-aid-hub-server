@@ -2,7 +2,7 @@
 
 const readline = require('readline');
 const googleAuth = require('google-auth-library');
-const moment = require('moment');
+const isEmpty = require('lodash').isEmpty;
 const {
   firestore
 } = require('../lib/setupFirebase');
@@ -74,7 +74,12 @@ function checkIfExists(title) {
     .get()
     .then(function (querySnapshot) {
       if (!querySnapshot.empty) {
-        return true;
+        let networks =[];
+        querySnapshot.forEach(ele => {
+          network = { ...ele.data(), id: ele.id};
+          networks.push(network);
+        })
+        return networks;
       } else {
         return false;
       }
@@ -83,6 +88,47 @@ function checkIfExists(title) {
       console.log("Error getting documents: ", error);
     });
 
+}
+
+function checkForChanges(dbObject, newData) {
+  return Object.keys(newData).reduce((acc, key) => {
+    if (newData[key] && dbObject[key] && newData[key] !== dbObject[key]) {
+      console.log(key, newData[key], dbObject[key])
+      acc[key] = newData[key];
+    }
+    return acc;
+  }, {});
+}
+
+function updateLatLng(mutualAid, id) {
+  console.log('updating lat lng', id)
+  if (mutualAid.state) {
+    mutualAid.getLatandLog()
+      .then(() => {
+        if (mutualAid.lat) {
+          const databaseNetwork = mutualAid.createDatabaseObject();
+          const valid = validate.mutualAidNetwork(databaseNetwork);
+          if (valid) {
+            // R, S, T, U
+            // id,	validated, 	formatted_address, 	last_updated
+            if (true) {
+              return firestore.collection("mutual_aid_networks").doc(id).update(databaseNetwork)
+      
+                .catch(function (error) {
+                  console.error("Error adding document: ", error);
+                });
+            }
+          } else {
+            console.log('validation failed', validate.mutualAidNetwork.errors[0]);
+          }
+        } else {
+          console.log('no lat', mutualAid.title)
+        }
+      }).catch((e) => console.log(e.message, mutualAid.neighborhood, mutualAid.city, mutualAid.state))
+
+  } else {
+    console.log('no state')
+  }
 }
 
 function convertOneObject(object, rowNumber) {
@@ -96,6 +142,16 @@ function convertOneObject(object, rowNumber) {
 
   checkIfExists(object.title).then((exists) => {
     if (exists) {
+      console.log(exists.length)
+      // const newValues = checkForChanges(exists, object);
+      // if (!isEmpty(newValues)) {
+      //   if (!newValues.city & !newValues.neighborhood) {
+      //     return firestore.collection('mutual_aid_networks').doc(exists.id).update(newValues);
+      //   } else {
+      //     // console.log(mutualAid, newValues, exists.id)
+      //     return updateLatLng(mutualAid, exists.id);
+      //   }
+      // }
       return;
     }
     // geocode street address
@@ -141,15 +197,45 @@ function processOneRow(rowNumber, rowData) {
     return;
   }
   let object = MutualAidNetwork.makeEventFromSpreadSheet(rowData);
+  const neighborhoods = object.neighborhood ? object.neighborhood.split('/') : [];
   const cities = object.city ? object.city.split('/') : [];
-  if (cities.length > 1) {
-    let dupNetworks = cities.map((ele) => {
-      return {
-        ...object,
-        city: ele,
+  if (cities.length > 1 || neighborhoods.length > 1) {
+    let dupNetworks = [];
+    if (cities.length > 1 && neighborhoods.length > 1) {
+      const newCombos = [];
+      for (let i = 0; i < neighborhoods.length; i++) {
+        for (let j = 0; j < cities.length; j++) {
+          newCombos.push({
+            city: cities[j] || '',
+            neighborhood: neighborhoods[i] || '',
+          })
+        }      
       }
+      dupNetworks = newCombos.map((ele) => {
+         return {
+           ...object,
+           neighborhood: ele || '',
+         }
+       });
+    } else if (cities > 1) {
+      dupNetworks = cities.map((ele) => {
+        return {
+          ...object,
+          city: ele,
+        }
+      });
+    } else {
+        dupNetworks = neighborhoods.map((ele) => {
+          return {
+            ...object,
+            neighborhood: ele,
+          }
+        });
+    }
+
+    dupNetworks.forEach((net) => {
+      convertOneObject(net, rowNumber);
     })
-    dupNetworks.forEach((network) => convertOneObject(network, rowNumber))
   } else {
     convertOneObject(object, rowNumber)
   }
