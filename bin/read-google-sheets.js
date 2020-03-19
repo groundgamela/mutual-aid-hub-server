@@ -63,10 +63,10 @@ function writeToGoogle(googleSheetsRange, data) {
       data,
     ],
   };
+  return Promise.resolve();
   if (testing) {
-    return Promise.resolve();
   }
-  return googleMethods.write(oauth2Client, SHEET_ID, toWrite);
+  // return googleMethods.write(oauth2Client, SHEET_ID, toWrite);
 }
 
 function checkIfExists(title) {
@@ -118,7 +118,7 @@ function convertOneObject(object, rowNumber) {
                   });
               }
             } else {
-              console.log('failed');
+              console.log('failed', validate.mutualAidNetwork.errors[0]);
               googleSheetData = ['', validate.mutualAidNetwork.errors[0].dataPath, databaseNetwork.address, ''];
             }
             return writeToGoogle(googleSheetsRange, googleSheetData)
