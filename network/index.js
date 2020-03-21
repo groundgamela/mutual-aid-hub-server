@@ -31,10 +31,10 @@ class MutualAidNetwork {
 
     //geocodes an address
     getLatandLog() {
-        const address = `${this.neighborhood|| ''} ${this.city || ''} ${this.state || ''} ${this.country || ''}`;
+        const address = `${this.city || ''} ${this.state || ''} ${this.country || ''}`;
         var addressQuery = escape(address);
 
-        const type = this.neighborhood ? 'neighborhood	' : this.city ? 'place' : 'region';
+        const type = this.city ? 'place' : 'region';
         const apiUrl = "https://api.mapbox.com";
         const url = `${apiUrl}/geocoding/v5/mapbox.places/${addressQuery}.json?access_token=${process.env.MAPBOX_API_KEY}&types=${type}`
         return request

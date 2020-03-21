@@ -64,8 +64,7 @@ function writeToGoogle(googleSheetsRange, data) {
     ],
   };
   return Promise.resolve();
-  if (testing) {
-  }
+  if (testing) {}
   // return googleMethods.write(oauth2Client, SHEET_ID, toWrite);
 }
 
@@ -74,9 +73,12 @@ function checkIfExists(title) {
     .get()
     .then(function (querySnapshot) {
       if (!querySnapshot.empty) {
-        let networks =[];
+        let networks = [];
         querySnapshot.forEach(ele => {
-          network = { ...ele.data(), id: ele.id};
+          network = {
+            ...ele.data(),
+            id: ele.id
+          };
           networks.push(network);
         })
         return networks;
@@ -93,7 +95,6 @@ function checkIfExists(title) {
 function checkForChanges(dbObject, newData) {
   return Object.keys(newData).reduce((acc, key) => {
     if (newData[key] && dbObject[key] && newData[key] !== dbObject[key]) {
-      console.log(key, newData[key], dbObject[key])
       acc[key] = newData[key];
     }
     return acc;
@@ -113,7 +114,7 @@ function updateLatLng(mutualAid, id) {
             // id,	validated, 	formatted_address, 	last_updated
             if (true) {
               return firestore.collection("mutual_aid_networks").doc(id).update(databaseNetwork)
-      
+
                 .catch(function (error) {
                   console.error("Error adding document: ", error);
                 });
@@ -142,16 +143,19 @@ function convertOneObject(object, rowNumber) {
 
   checkIfExists(object.title).then((exists) => {
     if (exists) {
-      console.log(exists.length)
-      // const newValues = checkForChanges(exists, object);
-      // if (!isEmpty(newValues)) {
-      //   if (!newValues.city & !newValues.neighborhood) {
-      //     return firestore.collection('mutual_aid_networks').doc(exists.id).update(newValues);
-      //   } else {
-      //     // console.log(mutualAid, newValues, exists.id)
-      //     return updateLatLng(mutualAid, exists.id);
-      //   }
-      // }
+      exists.forEach((dbNetwork) => {
+        const newValues = checkForChanges(dbNetwork, object);
+        if (!isEmpty(newValues)) {
+          if (!newValues.city && !newValues.neighborhood) {
+            console.log('new values', newValues, dbNetwork.id)
+            // return firestore.collection('mutual_aid_networks').doc(exists.id).update(newValues);
+          } else {
+            // console.log(mutualAid, newValues, exists.id)
+            // return updateLatLng(mutualAid, exists.id);
+            return
+          }
+        }
+      })
       return;
     }
     // geocode street address
@@ -197,41 +201,14 @@ function processOneRow(rowNumber, rowData) {
     return;
   }
   let object = MutualAidNetwork.makeEventFromSpreadSheet(rowData);
-  const neighborhoods = object.neighborhood ? object.neighborhood.split('/') : [];
   const cities = object.city ? object.city.split('/') : [];
-  if (cities.length > 1 || neighborhoods.length > 1) {
-    let dupNetworks = [];
-    if (cities.length > 1 && neighborhoods.length > 1) {
-      const newCombos = [];
-      for (let i = 0; i < neighborhoods.length; i++) {
-        for (let j = 0; j < cities.length; j++) {
-          newCombos.push({
-            city: cities[j] || '',
-            neighborhood: neighborhoods[i] || '',
-          })
-        }      
+  if (cities.length > 1) {
+    let dupNetworks = cities.map((ele) => {
+      return {
+        ...object,
+        city: ele,
       }
-      dupNetworks = newCombos.map((ele) => {
-         return {
-           ...object,
-           neighborhood: ele || '',
-         }
-       });
-    } else if (cities > 1) {
-      dupNetworks = cities.map((ele) => {
-        return {
-          ...object,
-          city: ele,
-        }
-      });
-    } else {
-        dupNetworks = neighborhoods.map((ele) => {
-          return {
-            ...object,
-            neighborhood: ele,
-          }
-        });
-    }
+    });
 
     dupNetworks.forEach((net) => {
       convertOneObject(net, rowNumber);
