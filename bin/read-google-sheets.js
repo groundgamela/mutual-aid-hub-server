@@ -146,9 +146,9 @@ function convertOneObject(object, rowNumber) {
       exists.forEach((dbNetwork) => {
         const newValues = checkForChanges(dbNetwork, object);
         if (!isEmpty(newValues)) {
-          if (!newValues.city && !newValues.neighborhood) {
+          if (!newValues.city && !newValues.neighborhood && !newValues.state) {
             console.log('new values', newValues, dbNetwork.id)
-            // return firestore.collection('mutual_aid_networks').doc(exists.id).update(newValues);
+            return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).update(newValues);
           } else {
             // console.log(mutualAid, newValues, exists.id)
             // return updateLatLng(mutualAid, exists.id);
