@@ -94,7 +94,7 @@ function checkIfExists(title) {
 
 function checkForChanges(dbObject, newData) {
   return Object.keys(newData).reduce((acc, key) => {
-    if (newData[key] && dbObject[key] && newData[key] !== dbObject[key]) {
+    if (newData[key] && newData[key] !== dbObject[key]) {
       acc[key] = newData[key];
     }
     return acc;
