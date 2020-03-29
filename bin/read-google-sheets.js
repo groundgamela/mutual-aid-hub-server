@@ -136,8 +136,8 @@ function convertOneObject(object, rowNumber) {
   const googleSheetsRange = `North American Mutual Aid Networks!R${rowNumber}:U${rowNumber}`
   let googleSheetData;
   let mutualAid = new MutualAidNetwork(object);
-  if (mutualAid.country !== 'USA') {
-    return
+  if (mutualAid.country !== 'USA' && mutualAid.country !== 'Canada') {
+    return;
   }
 
 
@@ -158,6 +158,7 @@ function convertOneObject(object, rowNumber) {
       })
       return;
     }
+    console.log('adding new', mutualAid.title)
     // geocode street address
     if (mutualAid.state) {
       mutualAid.getLatandLog()
@@ -194,8 +195,6 @@ function convertOneObject(object, rowNumber) {
 }
 
 function processOneRow(rowNumber, rowData) {
-
-
   // no data
   if (!rowData[0]) {
     return;
