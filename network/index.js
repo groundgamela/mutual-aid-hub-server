@@ -31,12 +31,13 @@ class MutualAidNetwork {
 
     //geocodes an address
     getLatandLog() {
-        const address = `${this.city || ''} ${this.state || ''} ${this.country || ''}`;
+        const address = `${this.city || ''} ${this.state || ''}`;
         var addressQuery = escape(address);
 
         const type = this.city ? 'place' : 'region';
+        const country = this.country === 'USA' ? 'us' : this.country === 'Canada'? 'ca' : '';
         const apiUrl = "https://api.mapbox.com";
-        const url = `${apiUrl}/geocoding/v5/mapbox.places/${addressQuery}.json?access_token=${process.env.MAPBOX_API_KEY}&types=${type}`
+        const url = `${apiUrl}/geocoding/v5/mapbox.places/${addressQuery}.json?access_token=${process.env.MAPBOX_API_KEY}&types=${type}&country=${country}`;
         return request
             .get(url)
             .then(returned => {
@@ -50,7 +51,6 @@ class MutualAidNetwork {
                     this.lng = data.center[0];
                     this.bbox = data.bbox;
                     return this;
-
                 }
             })
     }
