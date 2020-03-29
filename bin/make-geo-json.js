@@ -1,6 +1,5 @@
 const tippecanoe = require('tippecanoe').tippecanoeAsync;
 
-const MBTiles = require('@mapbox/mbtiles');
 const fsPromises = require('fs').promises;
 
 const {
@@ -55,13 +54,16 @@ const createFeatures = (networks) => {
 }
 
 const updateIds = (listOfNetworks) => {
-    listOfNetworks.forEach(async (network) => {
-        await firestore.collection("mutual_aid_networks").doc(network.key)
+    
+    Promise.all(listOfNetworks.map((network) => {
+        return firestore.collection("mutual_aid_networks").doc(network.key)
             .update({
                 id: network.id,
                 category: network.category
             });
-        return network.id;
+    })).then(() => {
+        console.log('done')
+        process.exit(0);
     })
 }
 
