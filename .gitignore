@@ -48,3 +48,5 @@ townhall-testing-db-f6e7a390a67a.json
 *.txt
 
 styles/css
+
+/tmp
