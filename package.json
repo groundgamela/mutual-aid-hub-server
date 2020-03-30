@@ -4,8 +4,8 @@
   "description": "server mutual aid hub",
   "main": "index.js",
   "engines": {
-    "node": ">= 10.0",
-    "npm": ">= 6.4.0"
+    "node": ">= 12.0",
+    "npm": ">= 6.14.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/townhallproject/mutual-aid-networks-server#readme",
   "dependencies": {
+    "12": "^1.0.2",
     "@google-cloud/firestore": "^3.7.0",
     "@google/maps": "^0.3.1",
     "@mapbox/mbtiles": "^0.11.0",
