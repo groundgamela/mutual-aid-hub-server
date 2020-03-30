@@ -70,14 +70,17 @@ const updateIds = (listOfNetworks) => {
 getAllNetworksFromDatabase()
     .then(allNetworks => {
         const geoJson = createFeatures(allNetworks);
-        fsPromises.writeFile('./tmp/ma-networks.geojson', JSON.stringify(geoJson))
+        console.log('created geojson')
+        fsPromises.writeFile('tmp/ma-networks.geojson', JSON.stringify(geoJson))
             .then(() => {
-                tippecanoe(['./tmp/ma-networks.geojson'], {
+                console.log('creating tileset')
+                tippecanoe(['tmp/ma-networks.geojson'], {
                     zg: true,
-                    output: './tmp/ma-networks-tileset.mbtiles',
+                    output: 'tmp/ma-networks-tileset.mbtiles',
                     force: true,
                 }).then(() => {
-                    fsPromises.readFile('./tmp/ma-networks-tileset.mbtiles')
+                    console.log('reading')
+                    fsPromises.readFile('tmp/ma-networks-tileset.mbtiles')
                         .then((buffer) => {
                             uploadToS3(buffer)
                                 .then(() => {
