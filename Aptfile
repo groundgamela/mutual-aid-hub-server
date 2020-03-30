@@ -1,2 +1,3 @@
 # include packages
 libsqlite3-dev
+sqlite3-doc
