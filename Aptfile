@@ -2,7 +2,7 @@
 
 # or add custom apt repos
 # :repo:deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu bionic main universe
-:repo:deb ppa:ubuntu-toolchain-r/test
+
 # include packages
 build-essential
 libsqlite3-dev
