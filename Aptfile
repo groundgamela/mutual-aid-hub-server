@@ -1,7 +1,7 @@
 # add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 # or add custom apt repos
-:repo:ppa ubuntu-toolchain-r/test -y
+:repo ppa:ubuntu-toolchain-r/test -y
 
 # include packages
 build-essential
