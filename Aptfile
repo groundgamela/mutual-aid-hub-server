@@ -1,11 +1,9 @@
 # add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 # or add custom apt repos
-:repo:deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu artful main universe
+:repo:deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu bionic main universe
 
 # include packages
 build-essential
 libsqlite3-dev
 zlib1g-dev
-update
-install g++-5
