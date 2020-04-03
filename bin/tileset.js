@@ -96,8 +96,9 @@ const makeNewSource = async (sourceName, allNetworks) => {
         acc = acc + JSON.stringify(cur) + '\n';
         return acc;
     }, '');
-    await fsPromises.writeFile('tmp/ma-networks.geojson.ld', ldGeoJson);
-    return postSource(sourceName, 'tmp/ma-networks.geojson.ld');
+    const path = __dirname + '/../tmp/ma-networks.geojson.ld';
+    await fsPromises.writeFile(path, ldGeoJson);
+    return postSource(sourceName, path);
 }
 
 const updateIds = (listOfNetworks) => {
@@ -123,6 +124,7 @@ processNewData = () => {
                 .then(() => deleteSource(getPreviousSource(nextSourceId)))
                 .then(() => updateIds(allNetworks))
                 .then(() => process.exit(0))
+                .catch(console.log)
                 })
         
 }
@@ -131,9 +133,9 @@ init = () => {
     checkStatus(TILESET_ID)
         .then((status) => {
             console.log('prev status: ', status)
-            if (status === 'processing') {
-                return setTimeout(init, 30000)
-            }
+            // if (status === 'processing') {
+            //     return setTimeout(init, 30000)
+            // }
             processNewData();
         })
 }
