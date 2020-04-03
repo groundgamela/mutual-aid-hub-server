@@ -102,7 +102,7 @@ const makeNewSource = async (sourceName, allNetworks) => {
 
 const updateIds = (listOfNetworks) => {
 
-    Promise.all(listOfNetworks.map((network) => {
+    return Promise.all(listOfNetworks.map((network) => {
         return firestore.collection("mutual_aid_networks").doc(network.key)
             .update({
                 id: network.id,
