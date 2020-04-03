@@ -96,8 +96,10 @@ const makeNewSource = async (sourceName, allNetworks) => {
         acc = acc + JSON.stringify(cur) + '\n';
         return acc;
     }, '');
+    console.log('writing file')
     const path = __dirname + '/../tmp/ma-networks.geojson.ld';
     await fsPromises.writeFile(path, ldGeoJson);
+    console.log('wrote file')
     return postSource(sourceName, path);
 }
 
