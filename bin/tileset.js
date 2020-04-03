@@ -12,7 +12,6 @@ const {
     deleteSource
 } = require('../lib/mapbox-tileset-api');
 
-
 const {
     firestore
 } = require('../lib/setupFirebase');
@@ -27,6 +26,17 @@ const SOURCE_ID_A = "mutual-aid-source-a";
 const SOURCE_ID_B = "mutual-aid-source-b";
 const TILESET_ID = "mutual-aid-tileset";
 
+const getRecipe = (sourceId) => ({
+    version: 1,
+    layers: {
+        mutual_aid_networks: {
+            source: `mapbox://tileset-source/${process.env.MAPBOX_USERNAME}/${sourceId}`,
+            minzoom: 0,
+            maxzoom: 16
+        }
+    }
+
+})
 
 //https://api.mapbox.com/tilesets/v1/sources/townhallproject/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN
 
@@ -79,32 +89,42 @@ const getNextSource = async () => {
     return useB ? SOURCE_ID_B : SOURCE_ID_A;
 }
 
-const makeNewSource = async (sourceName) => {
+const makeNewSource = async (sourceName, allNetworks) => {
 
-    const allNetworks = await getAllNetworksFromDatabase();
     const geoJson = createFeatures(allNetworks);
     ldGeoJson = geoJson.features.reduce((acc, cur) => {
         acc = acc + JSON.stringify(cur) + '\n';
         return acc;
     }, '');
     await fsPromises.writeFile('tmp/ma-networks.geojson.ld', ldGeoJson);
-    return postSource(sourceName);
+    return postSource(sourceName, 'tmp/ma-networks.geojson.ld');
+}
+
+const updateIds = (listOfNetworks) => {
+
+    Promise.all(listOfNetworks.map((network) => {
+        return firestore.collection("mutual_aid_networks").doc(network.key)
+            .update({
+                id: network.id,
+                category: network.category
+            });
+    }))
 }
 
 processNewData = () => {
     getNextSource()
-        .then((nextSourceId) => {
+        .then(async (nextSourceId) => {
             console.log('nextSourceId', nextSourceId)
-            makeNewSource(nextSourceId)
-                .then(() => {
-                    updateTileSet(TILESET_ID, nextSourceId)
-                        .then(() => {
-                            publishTileset(TILESET_ID)
-                                .then(() => deleteSource(getPreviousSource(nextSourceId)))
-                                    .then(() => process.exit(0))
-                        })
+            const allNetworks = await getAllNetworksFromDatabase();
+
+            makeNewSource(nextSourceId, allNetworks)
+                .then(() => updateTileSet(TILESET_ID, nextSourceId, getRecipe(nextSourceId)))
+                .then(() => publishTileset(TILESET_ID))
+                .then(() => deleteSource(getPreviousSource(nextSourceId)))
+                .then(() => updateIds(allNetworks))
+                .then(() => process.exit(0))
                 })
-        })
+        
 }
 
 init = () => {
