@@ -1,5 +1,6 @@
 
 const fsPromises = require('fs').promises;
+const mkdirp = require('mkdirp');
 
 const find = require('lodash').find;
 
@@ -97,10 +98,12 @@ const makeNewSource = async (sourceName, allNetworks) => {
         return acc;
     }, '');
     console.log('writing file')
-    const path = __dirname + '/../tmp/ma-networks.geojson.ld';
-    await fsPromises.writeFile(path, ldGeoJson);
+    const pathName = __dirname + '/../tmp/';
+    const fileName = pathName + 'ma-networks.geojson.ld';
+    await mkdirp(pathName);
+    await fsPromises.writeFile(fileName, ldGeoJson);
     console.log('wrote file')
-    return postSource(sourceName, path);
+    return postSource(sourceName, fileName);
 }
 
 const updateIds = (listOfNetworks) => {
@@ -135,9 +138,9 @@ init = () => {
     checkStatus(TILESET_ID)
         .then((status) => {
             console.log('prev status: ', status)
-            // if (status === 'processing') {
-            //     return setTimeout(init, 30000)
-            // }
+            if (status === 'processing') {
+                return setTimeout(init, 30000)
+            }
             processNewData();
         })
 }
