@@ -5,6 +5,7 @@ const googleAuth = require('google-auth-library');
 const isEmpty = require('lodash').isEmpty;
 const isEqual = require('lodash').isEqual;
 
+const FieldValue = require('firebase-admin').firestore.FieldValue;
 const {
   firestore
 } = require('../lib/setupFirebase');
@@ -79,11 +80,12 @@ function checkForChanges(dbObject, newData) {
     if (!newData[key] && dbObject[key]) {
       let emptyValue = MutualAidNetwork.getEmptyValue(key);
       if (emptyValue === -1) {
-        let docRef = firestore.collection('mutual_aid_networks').doc(dbNetwork.id);
+        let docRef = firestore.collection('mutual_aid_networks').doc(dbObject.id);
         // removing field that shouldn't be there
         docRef.update({
-          key: firebase.firestore.FieldValue.delete()
-        }).then(() => console.log('removed field', key));
+          [key]: FieldValue.delete()
+        }).then(() => console.log('removed field', key))
+          .catch(console.log);
       } else  {
         acc[key] = emptyValue;
       }
