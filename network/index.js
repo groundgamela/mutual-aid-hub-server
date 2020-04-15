@@ -20,7 +20,8 @@ class MutualAidNetwork {
 // validate.mutualAidNetworkSchema.properties
     static getEmptyValue(key) {
         if (!validate.mutualAidNetworkSchema.properties[key]) {
-            return null;
+            console.log('not found', key)
+            return -1;
         }
         switch (validate.mutualAidNetworkSchema.properties[key].type) {
             case "string":

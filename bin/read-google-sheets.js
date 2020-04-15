@@ -77,7 +77,16 @@ function checkForChanges(dbObject, newData) {
       acc[key] = newData[key];
     }
     if (!newData[key] && dbObject[key]) {
-      acc[key] = MutualAidNetwork.getEmptyValue(key);
+      let emptyValue = MutualAidNetwork.getEmptyValue(key);
+      if (emptyValue === -1) {
+        let docRef = firestore.collection('mutual_aid_networks').doc(dbNetwork.id);
+        // removing field that shouldn't be there
+        docRef.update({
+          key: firebase.firestore.FieldValue.delete()
+        }).then(() => console.log('removed field', key));
+      } else  {
+        acc[key] = emptyValue;
+      }
     }
     return acc;
   }, {});
