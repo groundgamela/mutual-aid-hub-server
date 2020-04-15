@@ -3,6 +3,8 @@
 const readline = require('readline');
 const googleAuth = require('google-auth-library');
 const isEmpty = require('lodash').isEmpty;
+const isEqual = require('lodash').isEqual;
+
 const {
   firestore
 } = require('../lib/setupFirebase');
@@ -69,103 +71,54 @@ function writeToGoogle(googleSheetsRange, data) {
   // return googleMethods.write(oauth2Client, SHEET_ID, toWrite);
 }
 
-function checkIfExists(title) {
-  return firestore.collection("mutual_aid_networks").where("title", "==", title)
-    .get()
-    .then(function (querySnapshot) {
-      if (!querySnapshot.empty) {
-        let networks = [];
-        querySnapshot.forEach(ele => {
-          network = {
-            ...ele.data(),
-            id: ele.id
-          };
-          networks.push(network);
-        })
-        return networks;
-      } else {
-        return false;
-      }
-    })
-    .catch(function (error) {
-      console.log("Error getting documents: ", error);
-    });
-
-}
-
 function checkForChanges(dbObject, newData) {
   return Object.keys(newData).reduce((acc, key) => {
-    if (newData[key] && newData[key] !== dbObject[key]) {
+    if (newData[key] && !isEqual(newData[key], dbObject[key])) {
       acc[key] = newData[key];
+    }
+    if (!newData[key] && dbObject[key]) {
+      acc[key] = MutualAidNetwork.getEmptyValue(key);
     }
     return acc;
   }, {});
 }
 
-function updateLatLng(mutualAid, id) {
-  console.log('updating lat lng', id)
-  if (mutualAid.state) {
-    mutualAid.getLatandLog()
-      .then(() => {
-        if (mutualAid.lat) {
-          const databaseNetwork = mutualAid.createDatabaseObject();
-          const valid = validate.mutualAidNetwork(databaseNetwork);
-          if (valid) {
-            // R, S, T, U
-            // id,	validated, 	formatted_address, 	last_updated
-            if (true) {
-              return firestore.collection("mutual_aid_networks").doc(id).update(databaseNetwork)
-
-                .catch(function (error) {
-                  console.error("Error adding document: ", error);
-                });
-            }
-          } else {
-            console.log('validation failed', validate.mutualAidNetwork.errors[0]);
-          }
-        } else {
-          console.log('no lat', mutualAid.title)
-        }
-      }).catch((e) => console.log(e.message, mutualAid.neighborhood, mutualAid.city, mutualAid.state))
-
-  } else {
-    console.log('no state')
-  }
-}
-
 function convertOneObject(object, rowNumber) {
   const googleSheetsRange = `${SHEET_NAME}!R${rowNumber}:U${rowNumber}`
   let googleSheetData;
-  let mutualAid = new MutualAidNetwork(object);
-  if (mutualAid.country !== 'USA' && mutualAid.country !== 'Canada') {
+  let newMutualAidNetwork = new MutualAidNetwork(object);
+  if (newMutualAidNetwork.country !== 'USA' && newMutualAidNetwork.country !== 'Canada') {
     return;
   }
 
 
-  checkIfExists(object.title).then((exists) => {
+  newMutualAidNetwork.checkIfExists().then((exists) => {
+    let shouldAdd = false;
     if (exists) {
       exists.forEach((dbNetwork) => {
-        const newValues = checkForChanges(dbNetwork, object);
+        const newValues = checkForChanges(dbNetwork, newMutualAidNetwork);
         if (!isEmpty(newValues)) {
-          if (!newValues.city && !newValues.neighborhood && !newValues.state) {
-            console.log('new values', newValues, dbNetwork.id, dbNetwork.title)
+          if (!newValues.city && !newValues.state) {
+            console.log('new values', newValues, dbNetwork.title);
             return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).update(newValues).catch(console.log);
           } else {
-            // console.log('needs to be re-geocoded', dbNetwork.title)
-            // return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).delete().catch(console.log);
-            return;
+            shouldAdd = true;
+            console.log('needs to be re-geocoded', dbNetwork.title, newValues, dbNetwork.city, dbNetwork.state)
+            firestore.collection('mutual_aid_networks').doc(dbNetwork.id).delete().catch(console.log);
           }
         }
       })
+    }
+    if (!shouldAdd) {
       return;
     }
-    console.log('adding new', mutualAid.title)
+    console.log('adding new', newMutualAidNetwork.title)
     // geocode street address
-    if (mutualAid.state) {
-      mutualAid.getLatandLog()
+    if (newMutualAidNetwork.state) {
+      newMutualAidNetwork.getLatandLog()
         .then(() => {
-          if (mutualAid.lat) {
-            const databaseNetwork = mutualAid.createDatabaseObject();
+          if (newMutualAidNetwork.lat) {
+            const databaseNetwork = newMutualAidNetwork.createDatabaseObject();
             const valid = validate.mutualAidNetwork(databaseNetwork);
             if (valid) {
               // R, S, T, U
@@ -185,9 +138,9 @@ function convertOneObject(object, rowNumber) {
             }
             return writeToGoogle(googleSheetsRange, googleSheetData)
           } else {
-            console.log('no lat', mutualAid.title)
+            console.log('no lat', newMutualAidNetwork.title)
           }
-        }).catch((e) => console.log(e.message, mutualAid.neighborhood, mutualAid.city, mutualAid.state))
+        }).catch((e) => console.log(e.message, newMutualAidNetwork.neighborhood, newMutualAidNetwork.city, newMutualAidNetwork.state))
 
     } else {
       console.log('no state')
