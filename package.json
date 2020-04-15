@@ -11,7 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "read": "node bin/read-google-sheets",
     "write-tileset": "node bin/tileset.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "clear-deleted": "node bin/delete-networks.js"
   },
   "repository": {
     "type": "git",
