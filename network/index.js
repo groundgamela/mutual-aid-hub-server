@@ -20,7 +20,10 @@ class MutualAidNetwork {
 
     constructor(obj) {
         for (let key in obj) {
-            this[key] = obj[key]
+            this[key] = obj[key] ? obj[key].trim() : undefined;
+        }
+        if (this.displayFilterTags) {
+            this.displayFilterTags = this.displayFilterTags.split(',');
         }
     }
 
@@ -75,7 +78,6 @@ class MutualAidNetwork {
                 out[property] = this[property];
                 return;
             }
-
             switch (attrs.type) {
                 case "string":
                     out[property] = '';
@@ -85,6 +87,9 @@ class MutualAidNetwork {
                     break;
                 case "number":
                     out[property] = 0;
+                    break;
+                case "array":
+                    out[property] = [];
                     break;
                 case "boolean":
                     out[property] = false;

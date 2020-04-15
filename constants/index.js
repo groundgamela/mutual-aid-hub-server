@@ -9,9 +9,13 @@ const HEADERS = [
     "supportOfferForm",
     "facebookPage",
     "language",
-    "community",
-    "contact",
+    "displayFilterTags",
+    "backendTags",
+    "geocodeError",
+    "zipCode",
+    "contact name",
     "email",
+    "hotlineNumber"
 ]
 
 module.exports = HEADERS;

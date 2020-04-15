@@ -12,6 +12,7 @@ const testing = process.env.NODE_ENV !== 'production';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
+const SHEET_NAME = "Mutual Aid Networks [LIVE DATA TO WEBSITE]";
 
 var clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 var clientId = process.env.GOOGLE_CLIENT_ID;
@@ -133,7 +134,7 @@ function updateLatLng(mutualAid, id) {
 }
 
 function convertOneObject(object, rowNumber) {
-  const googleSheetsRange = `North American Mutual Aid Networks!R${rowNumber}:U${rowNumber}`
+  const googleSheetsRange = `${SHEET_NAME}!R${rowNumber}:U${rowNumber}`
   let googleSheetData;
   let mutualAid = new MutualAidNetwork(object);
   if (mutualAid.country !== 'USA' && mutualAid.country !== 'Canada') {
@@ -147,12 +148,12 @@ function convertOneObject(object, rowNumber) {
         const newValues = checkForChanges(dbNetwork, object);
         if (!isEmpty(newValues)) {
           if (!newValues.city && !newValues.neighborhood && !newValues.state) {
-            console.log('new values', newValues, dbNetwork.id)
-            return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).update(newValues);
+            console.log('new values', newValues, dbNetwork.id, dbNetwork.title)
+            return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).update(newValues).catch(console.log);
           } else {
-            // console.log(mutualAid, newValues, exists.id)
-            // return updateLatLng(mutualAid, exists.id);
-            return
+            // console.log('needs to be re-geocoded', dbNetwork.title)
+            // return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).delete().catch(console.log);
+            return;
           }
         }
       })
@@ -217,7 +218,7 @@ function processOneRow(rowNumber, rowData) {
   }
 }
 
-googleMethods.read(oauth2Client, SHEET_ID, 'North American Mutual Aid Networks!A3:M')
+googleMethods.read(oauth2Client, SHEET_ID, `${SHEET_NAME}!A3:N`)
   .then((googleRows) => {
     googleRows.forEach((row, i) => {
       const thisRowIndex = i + 2;
