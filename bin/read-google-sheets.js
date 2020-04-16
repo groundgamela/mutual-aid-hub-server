@@ -104,7 +104,6 @@ function convertOneObject(object, rowNumber) {
 
 
   newMutualAidNetwork.checkIfExists().then((exists) => {
-    let shouldAdd = false;
     if (exists) {
       exists.forEach((dbNetwork) => {
         const newValues = checkForChanges(dbNetwork, newMutualAidNetwork);
@@ -113,14 +112,14 @@ function convertOneObject(object, rowNumber) {
             console.log('new values', newValues, dbNetwork.title);
             return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).update(newValues).catch(console.log);
           } else {
-            shouldAdd = true;
+            exists = false;
             console.log('needs to be re-geocoded', dbNetwork.title, newValues, dbNetwork.city, dbNetwork.state)
             firestore.collection('mutual_aid_networks').doc(dbNetwork.id).delete().catch(console.log);
           }
         }
       })
     }
-    if (!shouldAdd) {
+    if (exists) {
       return;
     }
     console.log('adding new', newMutualAidNetwork.title)

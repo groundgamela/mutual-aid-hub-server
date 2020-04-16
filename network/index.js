@@ -7,6 +7,7 @@ const {
 } = require('../lib/setupFirebase');
 const headers = require('../constants');
 const validate = require('../lib/schema');
+const stateNames = require('../lib/state-names');
 
 class MutualAidNetwork {
 
@@ -78,8 +79,8 @@ class MutualAidNetwork {
     getLatandLog() {
         const address = `${this.city || ''} ${this.state || ''}`;
         var addressQuery = escape(address);
-
         const type = this.city ? 'place' : 'region';
+        const stateAbr = this.state;
         const country = this.country === 'USA' ? 'us' : this.country === 'Canada' ? 'ca' : '';
         const apiUrl = "https://api.mapbox.com";
         const url = `${apiUrl}/geocoding/v5/mapbox.places/${addressQuery}.json?access_token=${process.env.MAPBOX_API_KEY}&types=${type}&country=${country}`;
@@ -90,7 +91,14 @@ class MutualAidNetwork {
                     body
                 } = returned;
                 if (body.features && body.features.length) {
-                    const data = body.features[0];
+                    const dataList = body.features;
+                    const data = _.find(dataList, (ele) => {
+                        return ele.place_name.includes(stateNames[stateAbr])
+                    });
+                    if (!data) {
+                        console.log('didnt find the right state', dataList, stateNames[stateAbr]);
+                        return this;
+                    }
                     this.address = data.matching_place_name || data.place_name;
                     this.lat = data.center[1];
                     this.lng = data.center[0];
