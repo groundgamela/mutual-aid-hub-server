@@ -77,7 +77,7 @@ class MutualAidNetwork {
 
     //geocodes an address
     getLatandLog() {
-        const address = `${this.city || ''} ${this.state || ''}`;
+        const address = `${this.city || ''} ${this.state || ''} ${this.zipCode || ''}`.trim();
         var addressQuery = escape(address);
         const type = this.city ? 'place' : 'region';
         const stateAbr = this.state;

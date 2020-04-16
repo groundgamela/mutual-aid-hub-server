@@ -108,7 +108,7 @@ function convertOneObject(object, rowNumber) {
       exists.forEach((dbNetwork) => {
         const newValues = checkForChanges(dbNetwork, newMutualAidNetwork);
         if (!isEmpty(newValues)) {
-          if (!newValues.city && !newValues.state) {
+          if (!newValues.city && !newValues.state && !newValues.zipCode) {
             console.log('new values', newValues, dbNetwork.title);
             return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).update(newValues).catch(console.log);
           } else {
