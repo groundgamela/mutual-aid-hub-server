@@ -11,7 +11,7 @@ const HEADERS = [
     "language",
     "displayFilterTags",
     "backendTags",
-    "geocodeError",
+    "geocodeStatus",
     "zipCode",
     "contact name",
     "email",
