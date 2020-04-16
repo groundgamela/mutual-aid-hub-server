@@ -96,7 +96,7 @@ class MutualAidNetwork {
                         return ele.place_name.includes(stateNames[stateAbr])
                     });
                     if (!data) {
-                        console.log('didnt find the right state', dataList, stateNames[stateAbr]);
+                        console.log('didnt find the right state', stateNames[stateAbr]);
                         return this;
                     }
                     this.address = data.matching_place_name || data.place_name;
