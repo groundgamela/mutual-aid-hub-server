@@ -18,6 +18,10 @@ class MutualAidNetwork {
         })
         return out;
     }
+
+    static isInSchema(key) {
+        return !!validate.mutualAidNetworkSchema.properties[key];
+    }
 // validate.mutualAidNetworkSchema.properties
     static getEmptyValue(key) {
         if (!validate.mutualAidNetworkSchema.properties[key]) {

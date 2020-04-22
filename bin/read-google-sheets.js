@@ -60,10 +60,12 @@ function getNewToken(oauth2Client, callback) {
 
 function checkForChanges(dbObject, newData) {
   return Object.keys(newData).reduce((acc, key) => {
+    if (!MutualAidNetwork.isInSchema(key)) {
+      return acc;
+    }
     if (newData[key] && !isEqual(newData[key], dbObject[key])) {
       acc[key] = newData[key];
-    }
-    if (!newData[key] && dbObject[key]) {
+    } else if (!newData[key] && dbObject[key]) {
       let emptyValue = MutualAidNetwork.getEmptyValue(key);
       if (emptyValue === -1) {
         let docRef = firestore.collection('mutual_aid_networks').doc(dbObject.id);
@@ -91,6 +93,9 @@ function convertOneObject(object) {
     if (exists) {
       exists.forEach((dbNetwork) => {
         const newValues = checkForChanges(dbNetwork, newMutualAidNetwork);
+        if(newValues.language) {
+          console.log(newValues)
+        }
         if (!isEmpty(newValues)) {
           if (!newValues.city && !newValues.state && !newValues.zipCode) {
             console.log('new values', newValues, dbNetwork.title);
