@@ -58,20 +58,6 @@ function getNewToken(oauth2Client, callback) {
   });
 }
 
-
-function writeToGoogle(googleSheetsRange, data) {
-  const toWrite = {
-    'range': googleSheetsRange,
-    'majorDimension': 'ROWS',
-    'values': [
-      data,
-    ],
-  };
-  return Promise.resolve();
-  if (testing) {}
-  // return googleMethods.write(oauth2Client, SHEET_ID, toWrite);
-}
-
 function checkForChanges(dbObject, newData) {
   return Object.keys(newData).reduce((acc, key) => {
     if (newData[key] && !isEqual(newData[key], dbObject[key])) {
@@ -94,9 +80,7 @@ function checkForChanges(dbObject, newData) {
   }, {});
 }
 
-function convertOneObject(object, rowNumber) {
-  const googleSheetsRange = `${SHEET_NAME}!R${rowNumber}:U${rowNumber}`
-  let googleSheetData;
+function convertOneObject(object) {
   let newMutualAidNetwork = new MutualAidNetwork(object);
   if (newMutualAidNetwork.country !== 'USA' && newMutualAidNetwork.country !== 'Canada') {
     return;
@@ -135,18 +119,14 @@ function convertOneObject(object, rowNumber) {
               // id,	validated, 	formatted_address, 	last_updated
               if (true) {
                 firestore.collection("mutual_aid_networks").add(databaseNetwork)
-                  .then(function (docRef) {
-                    googleSheetData = [docRef.id, true, databaseNetwork.address, ''];
-                  })
                   .catch(function (error) {
                     console.error("Error adding document: ", error);
                   });
               }
             } else {
               console.log('failed', validate.mutualAidNetwork.errors[0]);
-              googleSheetData = ['', validate.mutualAidNetwork.errors[0].dataPath, databaseNetwork.address, ''];
             }
-            return writeToGoogle(googleSheetsRange, googleSheetData)
+            return;
           } else {
             console.log('no lat', newMutualAidNetwork.title)
           }
@@ -181,7 +161,7 @@ function processOneRow(rowNumber, rowData) {
   }
 }
 
-googleMethods.read(oauth2Client, SHEET_ID, `${SHEET_NAME}!A3:N`)
+googleMethods.read(oauth2Client, SHEET_ID, `${SHEET_NAME}!A3:Q`)
   .then((googleRows) => {
     googleRows.forEach((row, i) => {
       const thisRowIndex = i + 2;
