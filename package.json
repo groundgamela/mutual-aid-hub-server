@@ -25,7 +25,6 @@
   },
   "homepage": "https://github.com/townhallproject/mutual-aid-networks-server#readme",
   "dependencies": {
-    "12": "^1.0.2",
     "@google-cloud/firestore": "^3.7.0",
     "@google/maps": "^0.3.1",
     "@mapbox/mbtiles": "^0.11.0",
@@ -34,7 +33,6 @@
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
     "express-request-proxy": "^2.2.2",
-    "express-session": "^1.15.0",
     "firebase-admin": "^8.7.0",
     "firebaseui": "^1.0.0",
     "geo-distance": "^0.1.2",
@@ -45,8 +43,7 @@
     "moment": "^2.21.0",
     "moment-timezone": "^0.5.26",
     "morgan": "^1.9.1",
-    "superagent": "^3.8.3",
-    "tippecanoe": "^0.6.0"
+    "superagent": "^3.8.3"
   },
   "devDependencies": {
     "eslint": "^3.16.0",
