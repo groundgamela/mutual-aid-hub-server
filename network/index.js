@@ -82,33 +82,31 @@ class MutualAidNetwork {
     //geocodes an address
     getLatandLog() {
         const address = `${this.city || ''} ${this.state || ''} ${this.zipCode || ''}`.trim();
-        var addressQuery = escape(address);
-        const type = this.city ? 'place' : 'region';
-        const stateAbr = this.state;
-        const country = this.country === 'USA' ? 'us' : this.country === 'Canada' ? 'ca' : '';
-        const apiUrl = "https://api.mapbox.com";
-        const url = `${apiUrl}/geocoding/v5/mapbox.places/${addressQuery}.json?access_token=${process.env.MAPBOX_API_KEY}&types=${type}&country=${country}`;
+        const apiUrl = "https://maps.googleapis.com/maps/api/geocode/json";
+        const key = ;
+        const addressQuery = address.replace(' ', '+');
+        const url = `${apiUrl}?key=${env.process.GEOCODE_KEY}`;
         return request
             .get(url)
+            .set('Accept', 'application/json')
+            .query({
+                address: addressQuery,
+            })
             .then(returned => {
                 const {
                     body
                 } = returned;
-                if (body.features && body.features.length) {
-                    const dataList = body.features;
-                    const data = _.find(dataList, (ele) => {
-                        return ele.place_name.includes(stateNames[stateAbr])
-                    });
-                    if (!data) {
-                        console.log('didnt find the right state', stateNames[stateAbr]);
-                        return this;
-                    }
-                    this.address = data.matching_place_name || data.place_name;
-                    this.lat = data.center[1];
-                    this.lng = data.center[0];
-                    this.bbox = data.bbox;
+                if (body.results[0]) {
+                    let data = body.results[0];
+                    this.address = data.formatted_address
+                    this.lat = data.geometry.location.lat;
+                    this.lng = data.geometry.location.lng;
+                    this.bbox = [data.geometry.viewport.southwest.lng, data.geometry.viewport.southwest.lat, 
+                        data.geometry.viewport.northeast.lng, data.geometry.viewport.southwest.lat];
+                    console.log(this.address)
                     return this;
                 }
+
             })
     }
 
