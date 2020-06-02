@@ -83,7 +83,6 @@ class MutualAidNetwork {
     getLatandLog() {
         const address = `${this.city || ''} ${this.state || ''} ${this.zipCode || ''}`.trim();
         const apiUrl = "https://maps.googleapis.com/maps/api/geocode/json";
-        const key = ;
         const addressQuery = address.replace(' ', '+');
         const url = `${apiUrl}?key=${env.process.GEOCODE_KEY}`;
         return request
