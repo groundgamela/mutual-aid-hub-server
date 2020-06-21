@@ -84,7 +84,7 @@ class MutualAidNetwork {
         const address = `${this.city || ''} ${this.state || ''} ${this.zipCode || ''}`.trim();
         const apiUrl = "https://maps.googleapis.com/maps/api/geocode/json";
         const addressQuery = address.replace(' ', '+');
-        const url = `${apiUrl}?key=${env.process.GEOCODE_KEY}`;
+        const url = `${apiUrl}?key=${process.env.GEOCODE_KEY}`;
         return request
             .get(url)
             .set('Accept', 'application/json')
