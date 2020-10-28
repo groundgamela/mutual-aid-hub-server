@@ -28,6 +28,10 @@ const mutualAidNetwork = {
       "description": "state covered",
       "type": "string",
     },
+    "category": {
+      "description": "type of data",
+      "enum": ["Network"],
+    },
     "country": {
       "description": "Country where the event takes place",
       "type": "string",
@@ -101,6 +105,7 @@ const mutualAidNetwork = {
     "city",
     "state",
     "country",
+    "category",
     "generalForm",
     "supportRequestForm",
     "supportOfferForm",

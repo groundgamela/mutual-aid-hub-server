@@ -44,6 +44,10 @@ const foodResource = {
       "description": "state covered",
       "type": "string",
     },
+    "category": {
+     "description": "type of data",
+     "enum": ["Food Resource"],
+   },
     "twitter": {
       "description": "social media link",
       "type": "string",
@@ -79,11 +83,32 @@ const foodResource = {
     "bbox": {
       "description": "bounding box of the region",
       "type": "array",
+    },
+    "hours": {
+      "description": "hours open",
+      "type": "string",
+    },
+    "organization": {
+      "description": "organization",
+      "type": "string",
+    },
+    "contact": {
+      "description": "contact info",
+      "type": "string",
+    },
+    "phone": {
+      "description": "phone number",
+      "type": "string",
+    },
+    "notes": {
+      "description": "notes",
+      "type": "string",
     }
   },
   "required": [
     "address",
     "resources",
+    "category",
     "title",
     "city",
     "state",

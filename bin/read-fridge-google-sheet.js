@@ -16,7 +16,9 @@ const testing = process.env.NODE_ENV !== 'production';
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = "Food Resources";
-const COLLECTION_NAME = "food_resource";
+const {
+  FOOD_RESOURCE_COLLECTION_NAME
+} = require('../constants');
 
 var clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 var clientId = process.env.GOOGLE_CLIENT_ID;
@@ -61,15 +63,18 @@ function getNewToken(oauth2Client, callback) {
 
 function checkForChanges(dbObject, newData) {
   return Object.keys(newData).reduce((acc, key) => {
-    if (!MutualAidNetwork.isInSchema(key)) {
+    if (!FoodResource.isInSchema(key)) {
+      return acc;
+    }
+    if (key === "address") {
       return acc;
     }
     if (newData[key] && !isEqual(newData[key], dbObject[key])) {
       acc[key] = newData[key];
     } else if (!newData[key] && dbObject[key]) {
-      let emptyValue = MutualAidNetwork.getEmptyValue(key);
+      let emptyValue = FoodResource.getEmptyValue(key);
       if (emptyValue === -1) {
-        let docRef = firestore.collection(COLLECTION_NAME).doc(dbObject.id);
+        let docRef = firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).doc(dbObject.id);
         // removing field that shouldn't be there
         docRef.update({
           [key]: FieldValue.delete()
@@ -88,17 +93,17 @@ function convertOneObject(object) {
 
   newFoodResource.checkIfExists().then((exists) => {
     if (exists) {
-      exists.forEach((resource) => {
-        const newValues = checkForChanges(resource, newFoodResource);
+      exists.forEach((dbResource) => {
+        const newValues = checkForChanges(dbResource, newFoodResource);
 
         if (!isEmpty(newValues)) {
           if (!newValues.city && !newValues.state) {
-            console.log('new values', newValues, dbNetwork.title);
-            return firestore.collection(COLLECTION_NAME).doc(dbNetwork.id).update(newValues).catch(console.log);
+            console.log('new values', newValues, dbResource.title);
+            return firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).doc(dbResource.id).update(newValues).catch(console.log);
           } else {
             exists = false;
-            console.log('needs to be re-geocoded', dbNetwork.title, newValues, dbNetwork.city, dbNetwork.state)
-            firestore.collection(COLLECTION_NAME).doc(dbNetwork.id).delete().catch(console.log);
+            console.log('needs to be re-geocoded', dbResource.title, newValues, dbResource.city, dbResource.state)
+            firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).doc(dbResource.id).delete().catch(console.log);
           }
         }
       })
@@ -118,7 +123,7 @@ function convertOneObject(object) {
               // R, S, T, U
               // id,	validated, 	formatted_address, 	last_updated
               if (true) {
-                firestore.collection(COLLECTION_NAME).add(dbFoodResource)
+                firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).add(dbFoodResource)
                   .catch(function (error) {
                     console.error("Error adding document: ", error);
                   });

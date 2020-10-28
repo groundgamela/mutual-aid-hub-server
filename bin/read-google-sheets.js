@@ -25,6 +25,7 @@ var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
 const validate = require('../lib/schema');
 const MutualAidNetwork = require('../network');
+const { NETWORK_COLLECTION_NAME } = require('../constants');
 
 const currentToken = {
   access_token: process.env.GOOGLE_ACCESS_TOKEN,
@@ -68,7 +69,7 @@ function checkForChanges(dbObject, newData) {
     } else if (!newData[key] && dbObject[key]) {
       let emptyValue = MutualAidNetwork.getEmptyValue(key);
       if (emptyValue === -1) {
-        let docRef = firestore.collection('mutual_aid_networks').doc(dbObject.id);
+        let docRef = firestore.collection(NETWORK_COLLECTION_NAME).doc(dbObject.id);
         // removing field that shouldn't be there
         docRef.update({
           [key]: FieldValue.delete()
@@ -99,11 +100,11 @@ function convertOneObject(object) {
         if (!isEmpty(newValues)) {
           if (!newValues.city && !newValues.state && !newValues.zipCode) {
             console.log('new values', newValues, dbNetwork.title);
-            return firestore.collection('mutual_aid_networks').doc(dbNetwork.id).update(newValues).catch(console.log);
+            return firestore.collection(NETWORK_COLLECTION_NAME).doc(dbNetwork.id).update(newValues).catch(console.log);
           } else {
             exists = false;
             console.log('needs to be re-geocoded', dbNetwork.title, newValues, dbNetwork.city, dbNetwork.state)
-            firestore.collection('mutual_aid_networks').doc(dbNetwork.id).delete().catch(console.log);
+            firestore.collection(NETWORK_COLLECTION_NAME).doc(dbNetwork.id).delete().catch(console.log);
           }
         }
       })
@@ -123,7 +124,7 @@ function convertOneObject(object) {
               // R, S, T, U
               // id,	validated, 	formatted_address, 	last_updated
               if (true) {
-                firestore.collection("mutual_aid_networks").add(databaseNetwork)
+                firestore.collection(NETWORK_COLLECTION_NAME).add(databaseNetwork)
                   .catch(function (error) {
                     console.error("Error adding document: ", error);
                   });

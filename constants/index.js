@@ -1,21 +1,7 @@
-const HEADERS = [
-    "title",
-    "neighborhood",
-    "city",
-    "state",
-    "country",
-    "generalForm",
-    "supportRequestForm",
-    "supportOfferForm",
-    "facebookPage",
-    "language",
-    "displayFilterTags",
-    "backendTags",
-    "geocodeStatus",
-    "zipCode",
-    "contact name",
-    "email",
-    "hotlineNumber"
-]
+const NETWORK_COLLECTION_NAME = "mutual_aid_networks";
+const FOOD_RESOURCE_COLLECTION_NAME = "food_resources";
 
-module.exports = HEADERS;
+module.exports = {
+    NETWORK_COLLECTION_NAME: NETWORK_COLLECTION_NAME,
+    FOOD_RESOURCE_COLLECTION_NAME: FOOD_RESOURCE_COLLECTION_NAME
+}
