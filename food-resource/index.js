@@ -8,6 +8,7 @@ const {
 const headers = require('./constants');
 const validate = require('./schema');
 const stateNames = require('../lib/state-names');
+const { FOOD_RESOURCE_COLLECTION_NAME } = require('../constants');
 
 class FoodResource {
 
@@ -44,13 +45,14 @@ class FoodResource {
     constructor(obj) {
         this.resources = {};
         for (let key in obj) {
-            if (key === "fridge" || key === "freezer" || key === "panty" || key === "foodBank") {
+            if (key === "fridge" || key === "freezer" || key === "pantry" || key === "foodBank") {
                 this.resources[key] = obj[key] === 'TRUE';
             } else {
 
                 this[key] = obj[key] ? obj[key].trim() : undefined;
             }
         }
+        this.category = "Food Resource"
 
     }
 
@@ -59,7 +61,7 @@ class FoodResource {
     }
 
     checkIfExists() {
-        return firestore.collection("food_resources").where("title", "==", this.title)
+        return firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).where("title", "==", this.title)
             .get()
             .then(function (querySnapshot) {
                 if (!querySnapshot.empty) {

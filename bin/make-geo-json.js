@@ -5,7 +5,7 @@ const fsPromises = require('fs').promises;
 const {
     firestore
 } = require('../lib/setupFirebase');
-const Point = require('./Point');
+const Point = require('../network/point');
 const uploadToS3 = require('../lib/mapboxUpload');
 
 const GENERAL = 'General';

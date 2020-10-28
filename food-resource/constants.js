@@ -2,7 +2,7 @@ const HEADERS = [
     "title",
     "fridge",
     "freezer",
-    "panty",
+    "pantry",
     "foodBank",
     "state",
     "city",

@@ -1,10 +1,12 @@
 
 const fsPromises = require('fs').promises;
 const mkdirp = require('mkdirp');
+const { NETWORK_COLLECTION_NAME, FOOD_RESOURCE_COLLECTION_NAME } = require('../constants');
 
 const find = require('lodash').find;
 
 const {
+    makeNewTileset,
     publishTileset,
     checkStatus,
     updateTileSet,
@@ -16,17 +18,18 @@ const {
 const {
     firestore
 } = require('../lib/setupFirebase');
-const Point = require('./Point');
+const NetworkPoint = require('../network/point');
+const ResourcePoint = require('../food-resource/point');
 
-const GENERAL = 'General';
-const OFFER_SUPPORT = 'Offer Support';
-const REQUEST_SUPPORT = 'Request Support';
-const INFORMATION = 'Community';
+const NETWORK = 'Network';
+const FOOD_RESOURCE = 'Food Resource';
 
-const SOURCE_ID_A = "mutual-aid-source-a";
-const SOURCE_ID_B = "mutual-aid-source-b";
-const TILESET_ID = "mutual-aid-tileset";
 
+const SOURCE_ID_A = "mutual-aid-source-a-testing";
+const SOURCE_ID_B = "mutual-aid-source-b-testing";
+const TESTING_TILESET_ID = "testing-mutual-aid-tileset";
+const PRODUCTION_TILESET_ID = "mutual-aid-tileset";
+const TILESET_ID = PRODUCTION_TILESET_ID;
 const getRecipe = (sourceId) => ({
     version: 1,
     layers: {
@@ -42,23 +45,12 @@ const getRecipe = (sourceId) => ({
 //https://api.mapbox.com/tilesets/v1/sources/townhallproject/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN
 
 const getAllNetworksFromDatabase = async () => {
-    const snapshot = await firestore.collection("mutual_aid_networks").get();
-    return snapshot.docs.map((doc, index) => {
+    const networks = await firestore.collection(NETWORK_COLLECTION_NAME).get();
+    return networks.map((doc, index) => {
         const data = doc.data();
         let category = data.category;
-        if (!category) {
-            if (data.generalForm || (data.supportRequestForm && data.supportOfferForm)) {
-                category = GENERAL;
-            }
-            else if (data.supportRequestForm) {
-                category = REQUEST_SUPPORT;
-            }
-            else if (data.supportOfferForm) {
-                category = OFFER_SUPPORT;
-            }
-            else {
-                category = INFORMATION;
-            }
+        if (!data.category) {
+            category = NETWORK;
         }
         return {
             ...data,
@@ -75,7 +67,7 @@ const createFeatures = (networks) => {
         type: 'FeatureCollection',
     };
     featuresHome.features = networks.map((network) => {
-        const newFeature = new Point(network);
+        let newFeature = new NetworkPoint(network);
         return newFeature;
     });
     return featuresHome;
@@ -109,7 +101,8 @@ const makeNewSource = async (sourceName, allNetworks) => {
 const updateIds = (listOfNetworks) => {
 
     return Promise.all(listOfNetworks.map((network) => {
-        return firestore.collection("mutual_aid_networks").doc(network.key)
+        const collection = NETWORK_COLLECTION_NAME;
+        return firestore.collection(collection).doc(network.key)
             .update({
                 id: network.id,
                 category: network.category
@@ -124,6 +117,7 @@ processNewData = () => {
             const allNetworks = await getAllNetworksFromDatabase();
 
             makeNewSource(nextSourceId, allNetworks)
+                // .then(() => makeNewTileset(TILESET_ID, nextSourceId)) // need to run the first time
                 .then(() => updateTileSet(TILESET_ID, nextSourceId, getRecipe(nextSourceId)))
                 .then(() => publishTileset(TILESET_ID))
                 .then(() => deleteSource(getPreviousSource(nextSourceId)))

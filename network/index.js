@@ -5,8 +5,8 @@ const moment = require('moment-timezone');
 const {
     firestore
 } = require('../lib/setupFirebase');
-const headers = require('../constants');
-const validate = require('../lib/schema');
+const headers = require('./headers');
+const validate = require('./schema');
 const stateNames = require('../lib/state-names');
 
 class MutualAidNetwork {
@@ -46,6 +46,7 @@ class MutualAidNetwork {
         for (let key in obj) {
             this[key] = obj[key] ? obj[key].trim() : undefined;
         }
+        this.category = "Network";
         this.displayFilterTags = this.displayFilterTags ? this.displayFilterTags.split(',') : [];
         this.backendTags = this.backendTags ? this.backendTags.split(', ') : [];
         this.language = this.language ? this.language.split(', ') : [];
