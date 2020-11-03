@@ -19,7 +19,6 @@ var redirectUrl = process.env.GOOGLE_REDIRECT_URI_1;
 var auth = new googleAuth();
 var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
-const validate = require('../lib/schema');
 const MutualAidNetwork = require('../network');
 
 const currentToken = {
