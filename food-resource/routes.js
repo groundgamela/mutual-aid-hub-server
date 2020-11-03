@@ -77,6 +77,6 @@ eventRouter.post('/validate-events',
             }
         })
         console.log('finished queuing requests')
-        res.send({message: { failed_ids: req.failed_events}});;
+        res.send({message: { failed_ids: req.failed_events}});
     }
 )
