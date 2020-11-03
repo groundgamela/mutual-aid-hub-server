@@ -11,7 +11,6 @@ const {
 } = require('../lib/setupFirebase');
 const googleMethods = require('../lib/google-methods');
 
-const testing = process.env.NODE_ENV !== 'production';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
@@ -38,28 +37,28 @@ const currentToken = {
 
 oauth2Client.credentials = currentToken;
 
-function getNewToken(oauth2Client, callback) {
-  var authUrl = oauth2Client.generateAuthUrl({
-    scope: SCOPES,
-  });
-  console.log('Authorize this app by visiting this url: ', authUrl);
-  var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Enter the code from that page here: ', function (code) {
-    rl.close();
-    oauth2Client.getToken(code, function (err, token) {
-      if (err) {
-        console.log('Error while trying to retrieve access token', err);
-        return;
-      }
-      console.log('got token', token);
-      oauth2Client.credentials = token;
-      callback(oauth2Client);
-    });
-  });
-}
+/* function getNewToken(oauth2Client, callback) { */
+  // var authUrl = oauth2Client.generateAuthUrl({
+  //   scope: SCOPES,
+  // });
+  // console.log('Authorize this app by visiting this url: ', authUrl);
+  // var rl = readline.createInterface({
+  //   input: process.stdin,
+  //   output: process.stdout,
+  // });
+  // rl.question('Enter the code from that page here: ', function (code) {
+  //   rl.close();
+  //   oauth2Client.getToken(code, function (err, token) {
+  //     if (err) {
+  //       console.log('Error while trying to retrieve access token', err);
+  //       return;
+  //     }
+  //     console.log('got token', token);
+  //     oauth2Client.credentials = token;
+  //     callback(oauth2Client);
+  //   });
+  // });
+/* } */
 
 function checkForChanges(dbObject, newData) {
   return Object.keys(newData).reduce((acc, key) => {

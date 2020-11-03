@@ -1,12 +1,11 @@
 
 const fsPromises = require('fs').promises;
 const mkdirp = require('mkdirp');
-const { NETWORK_COLLECTION_NAME, FOOD_RESOURCE_COLLECTION_NAME } = require('../constants');
+const { NETWORK_COLLECTION_NAME } = require('../constants');
 
 const find = require('lodash').find;
 
 const {
-    makeNewTileset,
     publishTileset,
     checkStatus,
     updateTileSet,
@@ -19,15 +18,12 @@ const {
     firestore
 } = require('../lib/setupFirebase');
 const NetworkPoint = require('../network/point');
-const ResourcePoint = require('../food-resource/point');
 
 const NETWORK = 'Network';
-const FOOD_RESOURCE = 'Food Resource';
 
 
 const SOURCE_ID_A = "mutual-aid-source-a-testing";
 const SOURCE_ID_B = "mutual-aid-source-b-testing";
-const TESTING_TILESET_ID = "testing-mutual-aid-tileset";
 const PRODUCTION_TILESET_ID = "mutual-aid-tileset";
 const TILESET_ID = PRODUCTION_TILESET_ID;
 const getRecipe = (sourceId) => ({
@@ -125,7 +121,7 @@ processNewData = () => {
                 .then(() => process.exit(0))
                 .catch(console.log)
                 })
-        
+
 }
 
 init = () => {

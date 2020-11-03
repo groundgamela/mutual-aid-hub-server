@@ -6,7 +6,6 @@ const map = require('lodash').map;
 const filter = require('lodash').filter;
 const forEach = require('lodash').forEach;
 
-const ServerError = require('../lib/error');
 
 const processEvent = require('./process-one-event');
 const Event = require('./index');
@@ -73,7 +72,7 @@ eventRouter.post('/validate-events',
                 setTimeout(() => {
                     processEvent(newEvent)
                 }, index * 1000)
-                                              
+
             }
         })
         console.log('finished queuing requests')

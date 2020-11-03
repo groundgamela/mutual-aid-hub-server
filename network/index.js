@@ -1,13 +1,11 @@
 const request = require('superagent');
 const _ = require('lodash');
 
-const moment = require('moment-timezone');
 const {
     firestore
 } = require('../lib/setupFirebase');
 const headers = require('./headers');
 const validate = require('./schema');
-const stateNames = require('../lib/state-names');
 
 class MutualAidNetwork {
 
@@ -39,7 +37,7 @@ class MutualAidNetwork {
             case "boolean":
                 return false;
         }
-        
+
     }
 
     constructor(obj) {
@@ -101,7 +99,7 @@ class MutualAidNetwork {
                     this.address = data.formatted_address
                     this.lat = data.geometry.location.lat;
                     this.lng = data.geometry.location.lng;
-                    this.bbox = [data.geometry.viewport.southwest.lng, data.geometry.viewport.southwest.lat, 
+                    this.bbox = [data.geometry.viewport.southwest.lng, data.geometry.viewport.southwest.lat,
                         data.geometry.viewport.northeast.lng, data.geometry.viewport.southwest.lat];
                     console.log(this.address)
                     return this;
@@ -124,7 +122,7 @@ class MutualAidNetwork {
         }
     }
 
-    
+
 
     createDatabaseObject() {
         const out = {};
