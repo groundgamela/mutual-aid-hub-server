@@ -47,6 +47,8 @@ class FoodResource {
         for (let key in obj) {
             if (key === "fridge" || key === "freezer" || key === "pantry" || key === "foodBank") {
                 this.resources[key] = obj[key] === 'TRUE';
+            } else if (obj[key] === "TRUE" || obj[key] === "FALSE") {
+                this[key] = obj[key] === "TRUE";
             } else {
 
                 this[key] = obj[key] ? obj[key].trim() : undefined;
@@ -124,6 +126,14 @@ class FoodResource {
                 }
 
             })
+    }
+
+    deleteById(id) {
+        if (!id) {
+            console.log('no id');
+            return;
+        }
+        return firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).doc(id).delete()
     }
 
     async getTimeZone() {

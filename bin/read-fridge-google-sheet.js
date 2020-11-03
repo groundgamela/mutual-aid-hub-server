@@ -94,6 +94,9 @@ function convertOneObject(object) {
   newFoodResource.checkIfExists().then((exists) => {
     if (exists) {
       exists.forEach((dbResource) => {
+        if (newFoodResource.delete) {
+          return newFoodResource.deleteById(dbResource.id);
+        }
         const newValues = checkForChanges(dbResource, newFoodResource);
 
         if (!isEmpty(newValues)) {
@@ -153,7 +156,7 @@ function processOneRow(rowNumber, rowData) {
   
 }
 
-googleMethods.read(oauth2Client, SHEET_ID, `${SHEET_NAME}!A3:Q`)
+googleMethods.read(oauth2Client, SHEET_ID, `${SHEET_NAME}!A3:R`)
   .then((googleRows) => {
     googleRows.forEach((row, i) => {
       const thisRowIndex = i + 2;

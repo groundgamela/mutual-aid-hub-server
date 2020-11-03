@@ -103,6 +103,10 @@ const foodResource = {
     "notes": {
       "description": "notes",
       "type": "string",
+    },
+    "delete": {
+      "description": "if network should be deleted",
+      "type": "boolean",
     }
   },
   "required": [

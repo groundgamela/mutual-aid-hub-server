@@ -15,7 +15,8 @@ const HEADERS = [
     "facebook",
     "website",
     "phone",
-    "notes"
+    "notes",
+    "delete",
 ]
 
 module.exports = HEADERS;
