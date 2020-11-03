@@ -125,12 +125,10 @@ function convertOneObject(object) {
             if (valid) {
               // R, S, T, U
               // id,	validated, 	formatted_address, 	last_updated
-              if (true) {
                 firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).add(dbFoodResource)
                   .catch(function (error) {
                     console.error("Error adding document: ", error);
                   });
-              }
             } else {
               console.log('failed', validate.foodResource.errors[0]);
             }
@@ -151,9 +149,9 @@ function processOneRow(rowNumber, rowData) {
   if (!rowData[0]) {
     return;
   }
-  let object = FoodResource.makeEventFromSpreadSheet(rowData); 
+  let object = FoodResource.makeEventFromSpreadSheet(rowData);
   convertOneObject(object, rowNumber)
-  
+
 }
 
 googleMethods.read(oauth2Client, SHEET_ID, `${SHEET_NAME}!A3:R`)

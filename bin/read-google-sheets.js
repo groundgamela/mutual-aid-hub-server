@@ -122,12 +122,10 @@ function convertOneObject(object) {
             if (valid) {
               // R, S, T, U
               // id,	validated, 	formatted_address, 	last_updated
-              if (true) {
                 firestore.collection(NETWORK_COLLECTION_NAME).add(databaseNetwork)
                   .catch(function (error) {
                     console.error("Error adding document: ", error);
                   });
-              }
             } else {
               console.log('failed', validate.mutualAidNetwork.errors[0]);
             }
