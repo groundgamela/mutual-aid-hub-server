@@ -1,5 +1,3 @@
-const tippecanoe = require('tippecanoe').tippecanoeAsync;
-
 const fsPromises = require('fs').promises;
 
 const {
@@ -54,7 +52,7 @@ const createFeatures = (networks) => {
 }
 
 const updateIds = (listOfNetworks) => {
-    
+
     Promise.all(listOfNetworks.map((network) => {
         return firestore.collection("mutual_aid_networks").doc(network.key)
             .update({
@@ -87,8 +85,8 @@ getAllNetworksFromDatabase()
                                     updateIds(allNetworks);
                                 })
                         })
-                    
-               
+
+
             }).catch(console.log)
     }).catch(console.log)
 })
