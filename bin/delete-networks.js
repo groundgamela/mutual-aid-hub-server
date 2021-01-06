@@ -52,53 +52,61 @@ oauth2Client.credentials = currentToken;
 /* } */
 
 
-function checkIfExists(title) {
-    return firestore.collection("mutual_aid_networks").where("title", "==", title)
-        .get()
-        .then(function (querySnapshot) {
-            if (!querySnapshot.empty) {
-                let networks = [];
-                querySnapshot.forEach(ele => {
-                    network = {
-                        ...ele.data(),
-                        id: ele.id
-                    };
-                    networks.push(network);
-                })
-                return networks;
-            } else {
-                return false;
-            }
-        })
-        .catch(function (error) {
-            console.log("Error getting documents: ", error);
-        });
+async function checkIfExists(title) {
+    try {
+        const querySnapshot = await firestore.collection("mutual_aid_networks").where("title", "==", title)
+            .get();
+        if (!querySnapshot.empty) {
+            let networks = [];
+            querySnapshot.forEach(ele => {
+                network = {
+                    ...ele.data(),
+                    id: ele.id
+                };
+                networks.push(network);
+            });
+            return networks;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("Error getting documents: ", error);
+    }
 
 }
 
 
-function processOneRow(rowNumber, rowData) {
+async function processOneRow(rowData) {
     // no data
     if (!rowData[0]) {
         return;
     }
     let object = MutualAidNetwork.makeEventFromSpreadSheet(rowData);
-    checkIfExists(object.title).then((exists) => {
-        if (exists && exists.length) {
-            exists.forEach((doc) => {
-                firestore.collection('mutual_aid_networks').doc(doc.id).delete()
-                    .then(() => console.log('deleted network', doc.title));
-            })
-        }
-    })
+    const exists = await checkIfExists(object.title);
+    console.log(exists)
+    if (exists && exists.length) {
+        exists.forEach(async (doc) => {
+            await firestore.collection('mutual_aid_networks').doc(doc.id).delete();
+            console.log('deleted network', doc.title);
+            return;
+        })
+    } else {
+        return;
+    }
+
 
 }
 
 googleMethods.read(oauth2Client, SHEET_ID, 'Deleted Entries!A3:M')
-    .then((googleRows) => {
-        googleRows.forEach((row, i) => {
-            const thisRowIndex = i + 2;
-            processOneRow(thisRowIndex, row)
+    .then(async (googleRows) => {
+        let totalProcessed = 0;
+        googleRows.forEach(async (row) => {
+            await processOneRow(row);
+            totalProcessed++;
+            console.log(totalProcessed, googleRows.length)
+            if (totalProcessed === googleRows.length) {
+                process.exit(0);
+            }
         });
     })
     .catch(e => {

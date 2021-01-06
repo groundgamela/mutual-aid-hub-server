@@ -101,7 +101,6 @@ class MutualAidNetwork {
                     this.lng = data.geometry.location.lng;
                     this.bbox = [data.geometry.viewport.southwest.lng, data.geometry.viewport.southwest.lat,
                         data.geometry.viewport.northeast.lng, data.geometry.viewport.southwest.lat];
-                    console.log(this.address)
                     return this;
                 }
 
