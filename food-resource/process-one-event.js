@@ -3,7 +3,7 @@ const {
 } = require('../lib/setupFirebase');
 
 const testing = process.env.NODE_ENV !== 'production';
-const validate = require('../lib/schema');
+const validate = require('./schema');
 
 
 function processEvent(newEvent) {
