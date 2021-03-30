@@ -46,19 +46,21 @@ const getRecipe = (sourceId) => ({
 
 const getAllNetworksFromDatabase = async () => {
     const networks = await firestore.collection(NETWORK_COLLECTION_NAME).get();
-    return networks.map((doc, index) => {
+    const processedNetworks = [];
+    networks.forEach((doc, index) => {
         const data = doc.data();
         let category = data.category;
         if (!data.category) {
             category = NETWORK;
         }
-        return {
+        processedNetworks.push({
             ...data,
             id: index,
             key: doc.id,
             category: category,
-        };
+        });
     });
+    return processedNetworks;
 }
 
 const createFeatures = (networks) => {

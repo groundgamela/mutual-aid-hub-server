@@ -63,7 +63,8 @@ class FoodResource {
     }
 
     checkIfExists() {
-        return firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).where("title", "==", this.title)
+        return firestore.collection(FOOD_RESOURCE_COLLECTION_NAME)
+            .where("title", "==", this.title)
             .get()
             .then(function (querySnapshot) {
                 if (!querySnapshot.empty) {
