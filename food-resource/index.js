@@ -108,7 +108,11 @@ class FoodResource {
                 if (body.results[0]) {
                     let data = body.results[0];
                     const returnedStateMatched = _.find(data.address_components, {short_name: requestedState});
-                    const returnedCityMatched = _.find(data.address_components, {short_name: requestedCity});
+                    const returnedCityMatched = _.find(data.address_components, {
+                        short_name: requestedCity
+                    }) || _.find(data.address_components, {
+                        long_name: requestedCity
+                    });
 
                     if (!returnedStateMatched) {
                         console.log('state doesnt match', data.address_components)
