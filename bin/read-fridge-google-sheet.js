@@ -123,14 +123,11 @@ function convertOneObject(object) {
             const dbFoodResource = newFoodResource.createDatabaseObject();
             const valid = validate.foodResource(dbFoodResource);
             if (valid) {
-              // R, S, T, U
-              // id,	validated, 	formatted_address, 	last_updated
-              if (true) {
-                firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).add(dbFoodResource)
-                  .catch(function (error) {
-                    console.error("Error adding document: ", error);
-                  });
-              }
+              firestore.collection(FOOD_RESOURCE_COLLECTION_NAME).add(dbFoodResource)
+                .catch(function (error) {
+                  console.error("Error adding document: ", error);
+                });
+              
             } else {
               console.log('failed', validate.foodResource.errors[0]);
             }
