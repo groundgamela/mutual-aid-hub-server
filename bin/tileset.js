@@ -19,15 +19,13 @@ const {
     firestore
 } = require('../lib/setupFirebase');
 const NetworkPoint = require('../network/point');
-const ResourcePoint = require('../food-resource/point');
 
 const NETWORK = 'Network';
-const FOOD_RESOURCE = 'Food Resource';
 
 
 const SOURCE_ID_A = "mutual-aid-source-a-testing";
 const SOURCE_ID_B = "mutual-aid-source-b-testing";
-const TESTING_TILESET_ID = "testing-mutual-aid-tileset";
+// const TESTING_TILESET_ID = "testing-mutual-aid-tileset";
 const PRODUCTION_TILESET_ID = "mutual-aid-tileset";
 const TILESET_ID = PRODUCTION_TILESET_ID;
 const getRecipe = (sourceId) => ({
@@ -47,7 +45,8 @@ const getRecipe = (sourceId) => ({
 const getAllNetworksFromDatabase = async () => {
     const networks = await firestore.collection(NETWORK_COLLECTION_NAME).get();
     const processedNetworks = [];
-    networks.forEach((doc, index) => {
+    let index = 0;
+    networks.forEach((doc) => {
         const data = doc.data();
         let category = data.category;
         if (!data.category) {
@@ -59,6 +58,7 @@ const getAllNetworksFromDatabase = async () => {
             key: doc.id,
             category: category,
         });
+        index++;
     });
     return processedNetworks;
 }
@@ -102,8 +102,8 @@ const makeNewSource = async (sourceName, allNetworks) => {
 
 const updateIds = (listOfNetworks) => {
 
+    const collection = NETWORK_COLLECTION_NAME;
     return Promise.all(listOfNetworks.map((network) => {
-        const collection = NETWORK_COLLECTION_NAME;
         return firestore.collection(collection).doc(network.key)
             .update({
                 id: network.id,
