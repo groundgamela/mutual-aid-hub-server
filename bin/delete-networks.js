@@ -1,15 +1,12 @@
 #!/usr/bin/env node
 
-const readline = require('readline');
 const googleAuth = require('google-auth-library');
-const isEmpty = require('lodash').isEmpty;
 const {
     firestore
 } = require('../lib/setupFirebase');
 const googleMethods = require('../lib/google-methods');
 
 
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 var clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -29,31 +26,9 @@ const currentToken = {
 
 oauth2Client.credentials = currentToken;
 
-function getNewToken(oauth2Client, callback) {
-    var authUrl = oauth2Client.generateAuthUrl({
-        scope: SCOPES,
-    });
-    console.log('Authorize this app by visiting this url: ', authUrl);
-    var rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    rl.question('Enter the code from that page here: ', function (code) {
-        rl.close();
-        oauth2Client.getToken(code, function (err, token) {
-            if (err) {
-                console.log('Error while trying to retrieve access token', err);
-                return;
-            }
-            console.log('got token', token);
-            oauth2Client.credentials = token;
-            callback(oauth2Client);
-        });
-    });
-}
-
 
 async function checkIfExists(title) {
+    console.log('checking:', title)
     try {
         const querySnapshot = await firestore.collection("mutual_aid_networks").where("title", "==", title)
             .get();
@@ -84,8 +59,8 @@ async function processOneRow(rowData) {
     }
     let object = MutualAidNetwork.makeEventFromSpreadSheet(rowData);
     const exists = await checkIfExists(object.title);
-    console.log(exists)
     if (exists && exists.length) {
+        console.log("Hasn't been deleted", object.title)
         exists.forEach(async (doc) => {
             await firestore.collection('mutual_aid_networks').doc(doc.id).delete();
             console.log('deleted network', doc.title);
@@ -104,7 +79,6 @@ googleMethods.read(oauth2Client, SHEET_ID, 'Deleted Entries!A3:M')
         googleRows.forEach(async (row) => {
             await processOneRow(row);
             totalProcessed++;
-            console.log(totalProcessed, googleRows.length)
             if (totalProcessed === googleRows.length) {
                 process.exit(0);
             }
