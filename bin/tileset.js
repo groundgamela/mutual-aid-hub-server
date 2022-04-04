@@ -34,7 +34,7 @@ const getRecipe = (sourceId) => ({
         mutual_aid_networks: {
             source: `mapbox://tileset-source/${process.env.MAPBOX_USERNAME}/${sourceId}`,
             minzoom: 0,
-            maxzoom: 16
+            maxzoom: 13
         }
     }
 
